@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const BASE_URL = 'https://emergency-response-app-3.onrender.com/api';
+
 const RescueDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ const RescueDashboard = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/rescue/incidents', {
+      const response = await axios.get(`${BASE_URL}/rescue/incidents`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIncidents(response.data.incidents);
@@ -27,7 +29,7 @@ const RescueDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/api/rescue/update-status/${incidentId}`,
+        `${BASE_URL}/rescue/update-status/${incidentId}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

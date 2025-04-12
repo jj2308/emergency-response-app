@@ -3,6 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useTheme } from '../ThemeContext';
 
+const BASE_URL = 'https://emergency-response-app-3.onrender.com/api';
+
 const LoginPage = () => {
   const { theme } = useTheme();
   const [username, setUsername] = useState('');
@@ -11,7 +13,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+      const response = await axios.post(`${BASE_URL}/auth/login`, { username, password });
       const { token, role } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);

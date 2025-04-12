@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const BASE_URL = 'https://emergency-response-app-3.onrender.com/api';
+
 const CitizenDashboard = () => {
   const [type, setType] = useState('');
   const [description, setDescription] = useState('');
@@ -14,7 +16,7 @@ const CitizenDashboard = () => {
   const fetchIncidents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/citizen/my-reports', {
+      const response = await axios.get(`${BASE_URL}/citizen/my-reports`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIncidents(response.data.incidents);
@@ -30,7 +32,7 @@ const CitizenDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/citizen/report-incident',
+        `${BASE_URL}/citizen/report-incident`,
         { type, description, location },
         { headers: { Authorization: `Bearer ${token}` } }
       );
