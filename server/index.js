@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path'); // ✅ Add path module
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -20,13 +21,18 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
-app.use('/api/auth', authRoutes);            // Authentication routes (register, login)
-app.use('/api', protectedRoutes);            // Test protected route
-app.use('/api/citizen', citizenRoutes);      // Citizen routes (report incidents)
-app.use('/api/rescue', rescueRoutes);        // Rescue routes (view & update incidents)
+app.use('/api/auth', authRoutes);
+app.use('/api', protectedRoutes);
+app.use('/api/citizen', citizenRoutes);
+app.use('/api/rescue', rescueRoutes);
 
-// Root route
-app.get('/', (req, res) => res.send('Server is running 🚀'));
+// Serve frontend build ✅✅✅
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 // Start the server
-app.listen(5000, () => console.log('Server started on port 5000'));
+const PORT = process.env.PORT || 5000; // ✅ Dynamic port for Railway
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
