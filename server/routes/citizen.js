@@ -19,9 +19,9 @@ router.post('/report-incident', verifyToken, authorizeRoles('citizen'), async (r
 
     await newIncident.save();
 
-    res.status(201).json({ message: 'Incident reported successfully!', incidentId: newIncident._id });
+    res.status(201).json({ message: "Incident reported successfully!", incidentId: newIncident._id });
   } catch (error) {
-    res.status(500).json({ message: 'Error reporting incident', error: error.message });
+    res.status(500).json({ message: "Error reporting incident", error: error.message });
   }
 });
 // Get My Reports
@@ -31,7 +31,7 @@ router.get('/my-reports', verifyToken, authorizeRoles('citizen'), async (req, re
   
       res.status(200).json({ incidents });
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching reports', error: error.message });
+      res.status(500).json({ message: "Error fetching reports", error: error.message });
     }
   });
   
