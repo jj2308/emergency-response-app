@@ -4,7 +4,6 @@ const Incident = require('../models/Incident');
 const { updateIncidentStatus } = require('../controllers/rescueController');
 const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
 
-// Rescue team: Get all incidents
 router.get('/incidents', verifyToken, authorizeRoles('rescue'), async (req, res) => {
   try {
     const incidents = await Incident.find().sort({ reportedAt: -1 }).populate('user', 'username role');
@@ -14,7 +13,6 @@ router.get('/incidents', verifyToken, authorizeRoles('rescue'), async (req, res)
   }
 });
 
-// Rescue team: Update incident status ✅✅✅
 router.put('/update-status/:incidentId', verifyToken, authorizeRoles('rescue'), updateIncidentStatus);
 
 module.exports = router;
