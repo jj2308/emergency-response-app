@@ -88,7 +88,7 @@ const RescueDashboard = () => {
                 </span>
               </p>
               <p><strong>Reported At:</strong> {new Date(incident.reportedAt).toLocaleString()}</p>
-              <div className="button-group">
+              <div className="button-group" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
   <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>
     Mark In Progress
   </button>
@@ -96,6 +96,9 @@ const RescueDashboard = () => {
     Mark Resolved
   </button>
 </div>
+
+
+
 
 
             </div>
