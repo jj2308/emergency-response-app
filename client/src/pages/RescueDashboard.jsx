@@ -12,7 +12,7 @@ const RescueDashboard = () => {
 
   useEffect(() => {
     fetchIncidents();
-    const interval = setInterval(fetchIncidents, 30000); // Auto-refresh every 30 sec
+    const interval = setInterval(fetchIncidents, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -65,7 +65,6 @@ const RescueDashboard = () => {
     const csvContent = 'data:text/csv;charset=utf-8,' + [header, ...rows].map(e => e.join(',')).join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
-
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     link.setAttribute('href', encodedUri);
     link.setAttribute('download', `incidents_${timestamp}.csv`);
@@ -81,7 +80,6 @@ const RescueDashboard = () => {
     window.location.href = '/';
   };
 
-  // Pagination Logic
   const indexOfLastIncident = currentPage * incidentsPerPage;
   const indexOfFirstIncident = indexOfLastIncident - incidentsPerPage;
   const currentIncidents = incidents.slice(indexOfFirstIncident, indexOfLastIncident);
@@ -89,18 +87,22 @@ const RescueDashboard = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const pendingCount = incidents.filter(i => i.status === 'pending').length;
+  const inProgressCount = incidents.filter(i => i.status === 'in-progress').length;
+  const resolvedCount = incidents.filter(i => i.status === 'resolved').length;
+
   return (
     <div className="container">
       <button className="logout-button" onClick={handleLogout}>Logout</button>
       <h2>Rescue Dashboard 🚨</h2>
       <button className="export-button" onClick={exportToCSV}>Export to CSV</button>
 
-      {/* Summary */}
-      <div style={{ margin: '20px 0', textAlign: 'center', fontWeight: 'bold' }}>
-        Total: {incidents.length} |{' '}
-        Pending: {incidents.filter(i => i.status === 'pending').length} |{' '}
-        In Progress: {incidents.filter(i => i.status === 'in-progress').length} |{' '}
-        Resolved: {incidents.filter(i => i.status === 'resolved').length}
+      {/* Summary Box */}
+      <div className="summary-box">
+        <div>Total Incidents: <strong>{incidents.length}</strong></div>
+        <div className="status-pending">Pending: {pendingCount}</div>
+        <div className="status-in-progress">In Progress: {inProgressCount}</div>
+        <div className="status-resolved">Resolved: {resolvedCount}</div>
       </div>
 
       {loading ? (
@@ -123,28 +125,20 @@ const RescueDashboard = () => {
                 </p>
                 <p><strong>Reported At:</strong> {new Date(incident.reportedAt).toLocaleString()}</p>
                 <div className="button-group">
-                  <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>
-                    Mark In Progress
-                  </button>
-                  <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>
-                    Mark Resolved
-                  </button>
+                  <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>Mark In Progress</button>
+                  <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>Mark Resolved</button>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Pagination Controls */}
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+          <div className="pagination">
             {[...Array(totalPages).keys()].map(number => (
               <button
                 key={number + 1}
                 onClick={() => paginate(number + 1)}
-                style={{
-                  backgroundColor: currentPage === number + 1 ? '#007bff' : 'gray',
-                  color: 'white',
-                  cursor: 'pointer',
-                }}
+                className={currentPage === number + 1 ? 'active' : ''}
               >
                 {number + 1}
               </button>
