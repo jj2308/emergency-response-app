@@ -18,7 +18,7 @@ const CitizenDashboard = () => {
 
   useEffect(() => {
     fetchIncidents();
-    const interval = setInterval(fetchIncidents, 30000); // 30 sec refresh
+    const interval = setInterval(fetchIncidents, 30000); // Refresh every 30s
     return () => clearInterval(interval);
   }, []);
 
@@ -55,13 +55,8 @@ const CitizenDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = '/';
-  };
-
   const exportToCSV = () => {
-    if (!filteredIncidents.length) {
+    if (filteredIncidents.length === 0) {
       toast.info('No incidents to export');
       return;
     }
@@ -72,19 +67,26 @@ const CitizenDashboard = () => {
       incident.description,
       incident.location,
       incident.status,
-      new Date(incident.reportedAt).toLocaleString()
+      new Date(incident.reportedAt).toLocaleString(),
     ]);
 
     const csvContent = 'data:text/csv;charset=utf-8,' + [header, ...rows].map(e => e.join(',')).join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `citizen_incidents_${timestamp}.csv`);
+    link.setAttribute('download', `my_incidents_${timestamp}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
     toast.success('Exported successfully!');
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = '/';
   };
 
   const filteredIncidents = incidents.filter(incident => {
@@ -95,6 +97,7 @@ const CitizenDashboard = () => {
     );
   });
 
+  // Pagination logic
   const indexOfLastIncident = currentPage * incidentsPerPage;
   const indexOfFirstIncident = indexOfLastIncident - incidentsPerPage;
   const currentIncidents = filteredIncidents.slice(indexOfFirstIncident, indexOfLastIncident);
@@ -107,7 +110,7 @@ const CitizenDashboard = () => {
       <button className="logout-button" onClick={handleLogout}>Logout</button>
       <h2>Citizen Dashboard 🧑‍💼</h2>
 
-      {/* ✅ Report Form */}
+      {/* Report Form */}
       <form onSubmit={handleReport} className="form-row">
         <select value={type} onChange={(e) => setType(e.target.value)} required>
           <option value="">Select Type</option>
@@ -122,7 +125,7 @@ const CitizenDashboard = () => {
         <button type="submit">Report Incident</button>
       </form>
 
-      {/* ✅ Filters */}
+      {/* Filters */}
       <div className="form-row">
         <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
           <option value="">Filter by Type</option>
@@ -132,8 +135,18 @@ const CitizenDashboard = () => {
           <option value="crime">Crime</option>
           <option value="other">Other</option>
         </select>
-        <input placeholder="Search by Description" value={filterDescription} onChange={(e) => setFilterDescription(e.target.value)} />
-        <input placeholder="Search by Location" value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} />
+        <input
+          type="text"
+          placeholder="Search by Description"
+          value={filterDescription}
+          onChange={(e) => setFilterDescription(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Search by Location"
+          value={filterLocation}
+          onChange={(e) => setFilterLocation(e.target.value)}
+        />
         <button type="button" onClick={() => {
           setFilterType('');
           setFilterDescription('');
@@ -153,7 +166,7 @@ const CitizenDashboard = () => {
             {currentIncidents.length === 0 ? (
               <p>No incidents match the filters.</p>
             ) : (
-              currentIncidents.map(incident => (
+              currentIncidents.map((incident) => (
                 <div key={incident._id} className="card">
                   <p><strong>Type:</strong> {incident.type}</p>
                   <p><strong>Description:</strong> {incident.description}</p>
@@ -170,8 +183,8 @@ const CitizenDashboard = () => {
             )}
           </div>
 
-          {/* ✅ Pagination */}
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Pagination Controls */}
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
             {[...Array(totalPages).keys()].map(number => (
               <button
                 key={number + 1}

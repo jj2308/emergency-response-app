@@ -7,9 +7,13 @@ const BASE_URL = 'https://emergency-response-app-3.onrender.com/api';
 const RescueDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const incidentsPerPage = 6;
 
   useEffect(() => {
     fetchIncidents();
+    const interval = setInterval(fetchIncidents, 30000); // Auto-refresh every 30 sec
+    return () => clearInterval(interval);
   }, []);
 
   const fetchIncidents = async () => {
@@ -20,7 +24,7 @@ const RescueDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIncidents(response.data.incidents);
-    } catch (error) {
+    } catch {
       toast.error('Error fetching incidents');
     } finally {
       setLoading(false);
@@ -77,29 +81,34 @@ const RescueDashboard = () => {
     window.location.href = '/';
   };
 
+  // Pagination Logic
+  const indexOfLastIncident = currentPage * incidentsPerPage;
+  const indexOfFirstIncident = indexOfLastIncident - incidentsPerPage;
+  const currentIncidents = incidents.slice(indexOfFirstIncident, indexOfLastIncident);
+  const totalPages = Math.ceil(incidents.length / incidentsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="container">
       <button className="logout-button" onClick={handleLogout}>Logout</button>
       <h2>Rescue Dashboard 🚨</h2>
       <button className="export-button" onClick={exportToCSV}>Export to CSV</button>
 
+      {/* Summary */}
+      <div style={{ margin: '20px 0', textAlign: 'center', fontWeight: 'bold' }}>
+        Total: {incidents.length} |{' '}
+        Pending: {incidents.filter(i => i.status === 'pending').length} |{' '}
+        In Progress: {incidents.filter(i => i.status === 'in-progress').length} |{' '}
+        Resolved: {incidents.filter(i => i.status === 'resolved').length}
+      </div>
+
       {loading ? (
-        <div className="spinner"></div>
+        <p>Loading incidents...</p>
       ) : (
         <>
-          {/* ✅ Place the summary OUTSIDE the map */}
-          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-            <h4>Summary:</h4>
-            <p>
-              Total: {incidents.length} |
-              Pending: {incidents.filter(i => i.status === 'pending').length} |
-              In Progress: {incidents.filter(i => i.status === 'in-progress').length} |
-              Resolved: {incidents.filter(i => i.status === 'resolved').length}
-            </p>
-          </div>
-
           <div className="card-grid">
-            {incidents.map(incident => (
+            {currentIncidents.map(incident => (
               <div key={incident._id} className="card">
                 <p><strong>Type:</strong> {incident.type}</p>
                 <p><strong>Description:</strong> {incident.description}</p>
@@ -122,6 +131,23 @@ const RescueDashboard = () => {
                   </button>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            {[...Array(totalPages).keys()].map(number => (
+              <button
+                key={number + 1}
+                onClick={() => paginate(number + 1)}
+                style={{
+                  backgroundColor: currentPage === number + 1 ? '#007bff' : 'gray',
+                  color: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                {number + 1}
+              </button>
             ))}
           </div>
         </>

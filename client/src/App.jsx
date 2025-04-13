@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
+// Theme toggle button component
 const ThemeToggle = () => {
   const { toggleTheme } = useTheme();
   return <button className="toggle-button" onClick={toggleTheme}>🥳 Light / 🌙 Dark</button>;
@@ -21,11 +22,18 @@ const App = () => {
     <ThemeProvider>
       <Router>
         <ThemeToggle />
-        <ToastContainer position="top-right" autoClose={3000} />
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route path="/citizen-dashboard" element={token && role === 'citizen' ? <CitizenDashboard /> : <Navigate to="/" />} />
-          <Route path="/rescue-dashboard" element={token && role === 'rescue' ? <RescueDashboard /> : <Navigate to="/" />} />
+          <Route
+            path="/citizen-dashboard"
+            element={token && role === 'citizen' ? <CitizenDashboard /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/rescue-dashboard"
+            element={token && role === 'rescue' ? <RescueDashboard /> : <Navigate to="/" />}
+          />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
     </ThemeProvider>
