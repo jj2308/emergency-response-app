@@ -72,6 +72,8 @@ const CitizenDashboard = () => {
       <h3>My Reported Incidents</h3>
       {loading ? (
         <p>Loading...</p>
+      ) : incidents.length === 0 ? (
+        <p>No incidents reported yet.</p>
       ) : (
         <div className="card-grid">
           {incidents.map((incident) => (
@@ -79,8 +81,7 @@ const CitizenDashboard = () => {
               <p><strong>Type:</strong> {incident.type}</p>
               <p><strong>Description:</strong> {incident.description}</p>
               <p><strong>Location:</strong> {incident.location}</p>
-              <p>
-                <strong>Status:</strong>{' '}
+              <p><strong>Status:</strong>{' '}
                 <span className={`status status-${incident.status.replace(' ', '-')}`}>
                   {incident.status.toUpperCase()}
                 </span>

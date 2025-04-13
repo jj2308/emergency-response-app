@@ -72,6 +72,8 @@ const RescueDashboard = () => {
 
       {loading ? (
         <p>Loading incidents...</p>
+      ) : incidents.length === 0 ? (
+        <p>No incidents available.</p>
       ) : (
         <div className="card-grid">
           {incidents.map((incident) => (
@@ -80,27 +82,17 @@ const RescueDashboard = () => {
               <p><strong>Description:</strong> {incident.description}</p>
               <p><strong>Location:</strong> {incident.location}</p>
               <p><strong>Reported By:</strong> {incident.user?.username}</p>
-<p style={{ color: 'gray', fontSize: '0.9rem' }}>{incident.user?.email}</p>
-              <p>
-                <strong>Status:</strong>{' '}
+              <p style={{ color: 'gray', fontSize: '0.9rem' }}>{incident.user?.email}</p>
+              <p><strong>Status:</strong>{' '}
                 <span className={`status status-${incident.status.replace(' ', '-')}`}>
                   {incident.status.toUpperCase()}
                 </span>
               </p>
               <p><strong>Reported At:</strong> {new Date(incident.reportedAt).toLocaleString()}</p>
               <div className="button-group" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
-  <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>
-    Mark In Progress
-  </button>
-  <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>
-    Mark Resolved
-  </button>
-</div>
-
-
-
-
-
+                <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>Mark In Progress</button>
+                <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>Mark Resolved</button>
+              </div>
             </div>
           ))}
         </div>
