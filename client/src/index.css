@@ -149,14 +149,15 @@ input:focus, select:focus {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
+  margin-top: 8px;
+  flex-wrap: nowrap; /* Ensure they stay in one line */
 }
 
 .button-group button {
-  flex: 1;
-  min-width: 120px;
+  width: auto; /* Remove stretch */
+  min-width: 120px; /* Optional: for equal size */
 }
+
 
 .login-card {
   max-width: 320px;
@@ -175,4 +176,9 @@ input:focus, select:focus {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+@media (max-width: 400px) {
+  .button-group {
+    flex-wrap: wrap;
+  }
 }
