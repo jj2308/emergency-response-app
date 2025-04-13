@@ -8,7 +8,9 @@ const RescueDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchIncidents(); }, []);
+  useEffect(() => {
+    fetchIncidents();
+  }, []);
 
   const fetchIncidents = async () => {
     try {
@@ -18,9 +20,9 @@ const RescueDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIncidents(response.data.incidents);
-      setLoading(false);
-    } catch {
+    } catch (error) {
       toast.error('Error fetching incidents');
+    } finally {
       setLoading(false);
     }
   };
@@ -41,22 +43,33 @@ const RescueDashboard = () => {
   };
 
   const exportToCSV = () => {
-    const header = ['Type', 'Description', 'Location', 'Status', 'Reported At'];
+    if (incidents.length === 0) {
+      toast.info('No incidents to export');
+      return;
+    }
+
+    const header = ['Type', 'Description', 'Location', 'Reported By', 'Status', 'Reported At'];
     const rows = incidents.map(incident => [
       incident.type,
       incident.description,
       incident.location,
+      incident.user?.username || 'N/A',
       incident.status,
-      new Date(incident.reportedAt).toLocaleString()
+      new Date(incident.reportedAt).toLocaleString(),
     ]);
+
     const csvContent = 'data:text/csv;charset=utf-8,' + [header, ...rows].map(e => e.join(',')).join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', 'incidents.csv');
+    link.setAttribute('download', `incidents_${timestamp}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    toast.success('Exported successfully!');
   };
 
   const handleLogout = () => {
@@ -71,35 +84,47 @@ const RescueDashboard = () => {
       <button className="export-button" onClick={exportToCSV}>Export to CSV</button>
 
       {loading ? (
-        <p>Loading incidents...</p>
-      ) : incidents.length === 0 ? (
-        <p>No incidents available.</p>
+        <div className="spinner"></div>
       ) : (
-        <div className="card-grid">
-          {incidents.map((incident) => (
-            <div key={incident._id} className="card">
-              <p><strong>Type:</strong> {incident.type}</p>
-              <p><strong>Description:</strong> {incident.description}</p>
-              <p><strong>Location:</strong> {incident.location}</p>
-              <p><strong>Reported By:</strong> {incident.user?.username}</p>
-              <p style={{ color: 'gray', fontSize: '0.9rem' }}>{incident.user?.email}</p>
-              <p><strong>Status:</strong>{' '}
-                <span className={`status status-${incident.status.replace(' ', '-')}`}>
-                  {incident.status.toUpperCase()}
-                </span>
-              </p>
-              <p><strong>Reported At:</strong> {new Date(incident.reportedAt).toLocaleString()}</p>
-              <div className="button-group" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
-  <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>
-    Mark In Progress
-  </button>
-  <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>
-    Mark Resolved
-  </button>
-</div>
-            </div>
-          ))}
-        </div>
+        <>
+          {/* ✅ Place the summary OUTSIDE the map */}
+          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <h4>Summary:</h4>
+            <p>
+              Total: {incidents.length} |
+              Pending: {incidents.filter(i => i.status === 'pending').length} |
+              In Progress: {incidents.filter(i => i.status === 'in-progress').length} |
+              Resolved: {incidents.filter(i => i.status === 'resolved').length}
+            </p>
+          </div>
+
+          <div className="card-grid">
+            {incidents.map(incident => (
+              <div key={incident._id} className="card">
+                <p><strong>Type:</strong> {incident.type}</p>
+                <p><strong>Description:</strong> {incident.description}</p>
+                <p><strong>Location:</strong> {incident.location}</p>
+                <p><strong>Reported By:</strong> {incident.user?.username}</p>
+                <p style={{ color: 'gray', fontSize: '0.9rem' }}>{incident.user?.email || ''}</p>
+                <p>
+                  <strong>Status:</strong>{' '}
+                  <span className={`status status-${incident.status.replace(' ', '-')}`}>
+                    {incident.status.toUpperCase()}
+                  </span>
+                </p>
+                <p><strong>Reported At:</strong> {new Date(incident.reportedAt).toLocaleString()}</p>
+                <div className="button-group">
+                  <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>
+                    Mark In Progress
+                  </button>
+                  <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>
+                    Mark Resolved
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
