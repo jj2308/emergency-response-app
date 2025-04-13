@@ -79,6 +79,8 @@ const RescueDashboard = () => {
               <p><strong>Type:</strong> {incident.type}</p>
               <p><strong>Description:</strong> {incident.description}</p>
               <p><strong>Location:</strong> {incident.location}</p>
+              <p><strong>Reported By:</strong> {incident.user?.username}</p>
+<p style={{ color: 'gray', fontSize: '0.9rem' }}>{incident.user?.email}</p>
               <p>
                 <strong>Status:</strong>{' '}
                 <span className={`status status-${incident.status.replace(' ', '-')}`}>
