@@ -90,9 +90,13 @@ const RescueDashboard = () => {
               </p>
               <p><strong>Reported At:</strong> {new Date(incident.reportedAt).toLocaleString()}</p>
               <div className="button-group" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
-                <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>Mark In Progress</button>
-                <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>Mark Resolved</button>
-              </div>
+  <button onClick={() => updateIncidentStatus(incident._id, 'in-progress')}>
+    Mark In Progress
+  </button>
+  <button onClick={() => updateIncidentStatus(incident._id, 'resolved')}>
+    Mark Resolved
+  </button>
+</div>
             </div>
           ))}
         </div>
