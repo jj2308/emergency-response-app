@@ -1,1 +1,2 @@
 ".env"  # Add to .gitignore if not already there
+"server/.env" 
